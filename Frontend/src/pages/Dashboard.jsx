@@ -39,8 +39,9 @@ const MetricCard = ({ icon, iconBg, label, value, valueColor, badge }) => (
 );
 
 const Dashboard = () => {
-  const [issues, setIssues] = useState([]);
-  const [error, setError]   = useState('');
+  const [issues, setIssues]       = useState([]);
+  const [error, setError]         = useState('');
+  const [showSupport, setShowSupport] = useState(false);
   const navigate = useNavigate();
   const role  = getRole();
 
@@ -197,6 +198,60 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Support Modal */}
+      {showSupport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+            <button
+              onClick={() => setShowSupport(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <span className="material-symbols-outlined text-slate-400">close</span>
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-indigo-600">support_agent</span>
+              </div>
+              <div>
+                <h3 className="font-headline font-bold text-slate-900">Contact Support</h3>
+                <p className="text-xs text-slate-500">We typically respond within 1 hour</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Subject</label>
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-900 transition-all"
+                  placeholder="Briefly describe your issue..."
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Message</label>
+                <textarea
+                  rows={4}
+                  className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-slate-900 transition-all resize-none"
+                  placeholder="Describe the problem in detail..."
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowSupport(false)}
+                className="flex-1 py-2.5 rounded-lg border border-slate-200 text-sm font-semibold hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShowSupport(false)}
+                className="flex-1 py-2.5 rounded-lg primary-gradient text-white text-sm font-bold hover:opacity-90 transition-all"
+              >
+                Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Bento */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
         <div className="md:col-span-2 lg:col-span-3 bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/10 ambient-shadow flex items-center justify-between">
@@ -204,7 +259,9 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold tracking-tight font-headline">Need technical assistance?</h3>
             <p className="text-slate-500 text-sm mt-1">Our support team is available 24/7 for internal system emergencies.</p>
           </div>
-          <button className="bg-slate-900 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shrink-0 ml-4">
+          <button
+              onClick={() => setShowSupport(true)}
+              className="bg-slate-900 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shrink-0 ml-4">
             Contact Support
           </button>
         </div>

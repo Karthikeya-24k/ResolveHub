@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAllUsers, updateUserRole } from '../services/api';
+import { getEmail } from '../services/auth';
 import Layout from '../components/Layout';
 import Badge from '../components/Badge';
 import AlertMessage from '../components/AlertMessage';
@@ -7,6 +8,8 @@ import AlertMessage from '../components/AlertMessage';
 const ROLES = ['USER', 'STAFF', 'ADMIN'];
 
 const ManageUsers = () => {
+  const currentEmail = getEmail();
+
   const [users, setUsers]         = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
@@ -54,6 +57,7 @@ const ManageUsers = () => {
   });
 
   const isFiltered = filterRole || search;
+  const isLocked   = (user) => user.role === 'ADMIN' || user.email === currentEmail;
 
   const admins = users.filter((u) => u.role === 'ADMIN').length;
   const staff  = users.filter((u) => u.role === 'STAFF').length;
@@ -185,7 +189,10 @@ const ManageUsers = () => {
                     <td className="px-6 py-5">
                       <div className="relative inline-block w-full max-w-[140px]">
                         <select
-                          className="w-full appearance-none bg-surface-container border-none text-xs font-bold rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none"
+                          disabled={isLocked(user)}
+                          className={`w-full appearance-none bg-surface-container border-none text-xs font-bold rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary/20 outline-none ${
+                            isLocked(user) ? 'opacity-40 cursor-not-allowed' : ''
+                          }`}
                           value={selected[user.id] || user.role}
                           onChange={(e) => setSelected((prev) => ({ ...prev, [user.id]: e.target.value }))}
                         >
@@ -196,16 +203,23 @@ const ManageUsers = () => {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex flex-col gap-1">
-                        <button
-                          onClick={() => handleUpdate(user.id)}
-                          disabled={updating === user.id}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-fixed text-primary rounded-lg text-xs font-bold hover:bg-secondary-container transition-all disabled:opacity-50"
-                        >
-                          <span className="material-symbols-outlined text-sm">
-                            {updating === user.id ? 'progress_activity' : 'save'}
+                        {isLocked(user) ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-xs font-bold cursor-not-allowed">
+                            <span className="material-symbols-outlined text-sm">lock</span>
+                            {user.email === currentEmail ? 'You' : 'Protected'}
                           </span>
-                          {updating === user.id ? 'Saving...' : 'Update'}
-                        </button>
+                        ) : (
+                          <button
+                            onClick={() => handleUpdate(user.id)}
+                            disabled={updating === user.id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-fixed text-primary rounded-lg text-xs font-bold hover:bg-secondary-container transition-all disabled:opacity-50"
+                          >
+                            <span className="material-symbols-outlined text-sm">
+                              {updating === user.id ? 'progress_activity' : 'save'}
+                            </span>
+                            {updating === user.id ? 'Saving...' : 'Update'}
+                          </button>
+                        )}
                         {updateMsg[user.id] && (
                           <span className={`text-[10px] font-bold ${updateMsg[user.id].type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
                             {updateMsg[user.id].text}
