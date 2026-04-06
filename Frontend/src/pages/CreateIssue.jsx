@@ -47,7 +47,7 @@ const CreateIssue = () => {
               <div className="space-y-2">
                 <label className="text-[11px] uppercase tracking-widest text-slate-500 font-bold">Issue Title</label>
                 <input
-                  className="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 outline-none transition-all py-4 px-0 text-lg font-medium placeholder:text-slate-300"
+                  className="w-full bg-white border border-slate-200 focus:border-slate-900 focus:ring-0 outline-none transition-all py-3 px-4 rounded-lg text-base font-medium placeholder:text-slate-300"
                   placeholder="e.g., Delayed response on ticket #402"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -57,7 +57,7 @@ const CreateIssue = () => {
               <div className="space-y-2">
                 <label className="text-[11px] uppercase tracking-widest text-slate-500 font-bold">Description</label>
                 <textarea
-                  className="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 outline-none transition-all py-4 px-0 text-base leading-relaxed placeholder:text-slate-300 resize-none"
+                  className="w-full bg-white border border-slate-200 focus:border-slate-900 focus:ring-0 outline-none transition-all py-3 px-4 rounded-lg text-base leading-relaxed placeholder:text-slate-300 resize-none"
                   rows={8}
                   placeholder="Please provide as much detail as possible, including steps to reproduce the issue..."
                   value={form.description}

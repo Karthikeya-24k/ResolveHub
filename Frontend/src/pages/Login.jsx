@@ -33,7 +33,7 @@ const Login = () => {
             <span className="material-symbols-outlined text-white text-3xl">forum</span>
           </div>
           <h1 className="font-headline font-extrabold text-4xl tracking-tight text-primary">
-            Complain System
+            ResolveHub
           </h1>
           <p className="text-on-surface-variant mt-2 font-medium">Issue resolution, refined.</p>
         </div>
@@ -55,7 +55,7 @@ const Login = () => {
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">mail</span>
                 <input
-                  className="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg focus:ring-0 outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface placeholder:text-outline"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-lg focus:border-slate-900 focus:ring-0 outline-none transition-all text-on-surface placeholder:text-slate-300"
                   type="email" placeholder="name@company.com"
                   value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required
                 />
@@ -69,7 +69,7 @@ const Login = () => {
               <div className="relative group">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">lock</span>
                 <input
-                  className="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg focus:ring-0 outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface placeholder:text-outline"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-lg focus:border-slate-900 focus:ring-0 outline-none transition-all text-on-surface placeholder:text-slate-300"
                   type="password" placeholder="••••••••"
                   value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required
                 />

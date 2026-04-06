@@ -30,7 +30,7 @@ const Register = () => {
       <div className="relative group">
         <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">{icon}</span>
         <input
-          className="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest border-none rounded-lg focus:ring-0 outline-none border-b-2 border-transparent focus:border-primary transition-all text-on-surface placeholder:text-outline"
+          className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-lg focus:border-slate-900 focus:ring-0 outline-none transition-all text-on-surface placeholder:text-slate-300"
           type={type} placeholder={placeholder}
           value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} required
         />

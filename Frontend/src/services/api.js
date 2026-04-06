@@ -31,6 +31,7 @@ export const updateUserRole = (id, role) => api.put(`/users/${id}/role`, { role 
 
 // Issues
 export const getAllIssues = () => api.get('/issues');
+export const getAllIssuesUnfiltered = () => api.get('/issues/all');
 export const getIssueById = (id) => api.get(`/issues/${id}`);
 export const createIssue = (data) => api.post('/issues', data);
 export const assignIssue = (data) => api.post('/issues/assign', data);
