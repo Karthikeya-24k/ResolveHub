@@ -34,10 +34,10 @@ const Sidebar = () => {
         </div>
         <div>
           <h2 className="text-lg font-black tracking-tighter text-indigo-600 leading-tight font-headline">
-            Internal Portal
+            ResolveHub
           </h2>
           <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase">
-            Issue Management
+            Issue Tracker
           </p>
         </div>
       </div>

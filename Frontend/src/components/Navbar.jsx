@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <header className="flex justify-between items-center px-6 py-3 w-full sticky top-0 bg-white/80 backdrop-blur-xl z-50 shadow-sm">
       <div className="flex items-center gap-4 flex-1">
-        <h1 className="text-xl font-bold text-slate-900 font-headline">Complain System</h1>
+        <h1 className="text-xl font-bold text-slate-900 font-headline">ResolveHub</h1>
         <div className="relative w-full max-w-md ml-4 hidden sm:block">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
           <input

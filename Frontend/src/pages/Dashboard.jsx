@@ -4,6 +4,21 @@ import { getAllIssues } from '../services/api';
 import { getRole } from '../services/auth';
 import Layout from '../components/Layout';
 
+const STATUS_COLOR = {
+  OPEN:         'bg-blue-100 text-blue-700',
+  UNDER_REVIEW: 'bg-purple-100 text-purple-700',
+  ASSIGNED:     'bg-indigo-100 text-indigo-700',
+  IN_PROGRESS:  'bg-amber-100 text-amber-700',
+  RESOLVED:     'bg-green-100 text-green-700',
+  CLOSED:       'bg-slate-100 text-slate-600',
+};
+
+const PRIORITY_COLOR = {
+  HIGH:   'bg-red-100 text-red-700',
+  MEDIUM: 'bg-orange-100 text-orange-700',
+  LOW:    'bg-slate-100 text-slate-500',
+};
+
 const MetricCard = ({ icon, iconBg, label, value, valueColor, badge }) => (
   <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10 ambient-shadow">
     <div className="flex justify-between items-start mb-4">
@@ -26,7 +41,7 @@ const Dashboard = () => {
   const [issues, setIssues] = useState([]);
   const [error, setError]   = useState('');
   const navigate = useNavigate();
-  const role = getRole();
+  const role  = getRole();
 
   useEffect(() => {
     getAllIssues()
@@ -80,13 +95,13 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Issues */}
         <div className="lg:col-span-2 bg-surface-container-lowest rounded-xl p-8 ambient-shadow">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold tracking-tight font-headline">Recent Issues</h3>
             <button onClick={() => navigate('/issues')} className="text-primary text-sm font-semibold hover:underline">
               View All
             </button>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {issues.length === 0 ? (
               <p className="text-sm text-on-surface-variant">No issues found.</p>
             ) : (
@@ -94,21 +109,23 @@ const Dashboard = () => {
                 <div
                   key={issue.id}
                   onClick={() => navigate(`/issues/${issue.id}`)}
-                  className="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+                  className="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer border border-transparent hover:border-outline-variant/20"
                 >
-                  <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-primary text-sm">bug_report</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-on-surface truncate">{issue.title}</p>
-                    <p className="text-xs text-on-surface-variant">#{issue.id}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">#{issue.id}{issue.assignedTo ? ` · ${issue.assignedTo}` : ''}</p>
                   </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container">
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${STATUS_COLOR[issue.status] || 'bg-slate-100 text-slate-600'}`}>
                       {issue.status || 'OPEN'}
                     </span>
                     {issue.priority && (
-                      <span className="text-xs text-on-surface-variant">{issue.priority}</span>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${PRIORITY_COLOR[issue.priority] || 'bg-slate-100 text-slate-500'}`}>
+                        {issue.priority}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -117,47 +134,69 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions + Status */}
+        {/* Quick Actions + Activity */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Quick Actions */}
           <div className="bg-surface-container-lowest rounded-xl p-6 ambient-shadow">
-            <h3 className="text-lg font-bold tracking-tight mb-6 font-headline">Quick Actions</h3>
-            <div className="space-y-3">
-              {[
-                { icon: 'list_alt',       label: 'View Issues',    sub: 'Issue Tracking',    to: '/issues'         },
-                { icon: 'add_circle',     label: 'Create Issue',   sub: 'Submit Complaint',  to: '/issues/create'  },
-                { icon: 'assignment_ind', label: 'Assign Issues',  sub: 'Admin Only',        to: '/issues/assign'  },
-                { icon: 'sync_alt',       label: 'Update Status',  sub: 'Staff Action',      to: '/issues/status'  },
-              ].map(({ icon, label, sub, to }) => (
+            <h3 className="text-lg font-bold tracking-tight mb-4 font-headline">Quick Actions</h3>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => navigate('/issues/create')}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg primary-gradient text-white font-semibold text-sm shadow shadow-primary/20 hover:opacity-90 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">add_circle</span>
+                Create Issue
+              </button>
+              <button
+                onClick={() => navigate('/issues')}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm text-primary">list_alt</span>
+                View My Issues
+              </button>
+              {role === 'STAFF' && (
                 <button
-                  key={to}
-                  onClick={() => navigate(to)}
-                  className="w-full flex items-center gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group text-left"
+                  onClick={() => navigate('/issues/status')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors"
                 >
-                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                    <span className="material-symbols-outlined text-primary">{icon}</span>
-                  </div>
-                  <div>
-                    <span className="block text-sm font-bold text-slate-900">{label}</span>
-                    <span className="text-[11px] text-slate-500 uppercase tracking-widest font-bold">{sub}</span>
-                  </div>
+                  <span className="material-symbols-outlined text-sm text-amber-500">sync_alt</span>
+                  Update Status
                 </button>
-              ))}
+              )}
+              {role === 'ADMIN' && (
+                <button
+                  onClick={() => navigate('/issues/assign')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm text-indigo-500">assignment_ind</span>
+                  Assign Issues
+                </button>
+              )}
             </div>
           </div>
 
-          {/* System Status */}
-          <div className="bg-indigo-600 rounded-xl p-6 text-white overflow-hidden relative shadow-lg shadow-indigo-200">
-            <div className="relative z-10">
-              <h3 className="font-bold text-lg mb-2 font-headline">System Status</h3>
-              <div className="flex items-center gap-2 text-indigo-100 text-sm mb-4">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                All services operational
-              </div>
-              <p className="text-xs text-indigo-200/80 leading-relaxed">
-                The complaint intake engine and database clusters are performing optimally.
-              </p>
+          {/* Recent Activity */}
+          <div className="bg-surface-container-lowest rounded-xl p-6 ambient-shadow">
+            <h3 className="text-lg font-bold tracking-tight mb-4 font-headline">Recent Activity</h3>
+            <div className="space-y-3">
+              {issues.length === 0 ? (
+                <p className="text-sm text-slate-400">No recent activity.</p>
+              ) : (
+                issues.slice(0, 4).map((issue) => (
+                  <div key={issue.id} className="flex items-start gap-3">
+                    <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                      issue.status === 'RESOLVED'    ? 'bg-green-500' :
+                      issue.status === 'IN_PROGRESS' ? 'bg-amber-500' :
+                      issue.status === 'OPEN'        ? 'bg-blue-500'  : 'bg-slate-400'
+                    }`} />
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-800 truncate">{issue.title}</p>
+                      <p className="text-[11px] text-slate-400">{issue.status}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-white/10 text-[120px] pointer-events-none">auto_awesome</span>
           </div>
         </div>
       </div>

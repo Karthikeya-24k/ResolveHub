@@ -51,6 +51,11 @@ public class IssueController {
         return issueService.updateStatus(request);
     }
 
+    @GetMapping("/all")
+    public List<IssueResponse> getAllIssuesUnfiltered() {
+        return issueService.getAllIssuesUnfiltered();
+    }
+
     @GetMapping("/page")
     public Page<IssuesEntity> getIssues(@RequestParam int page, @RequestParam int size) {
         return issueRepo.findAll(PageRequest.of(page, size));

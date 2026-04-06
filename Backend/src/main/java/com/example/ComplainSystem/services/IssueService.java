@@ -88,6 +88,10 @@ public class IssueService {
         };
     }
 
+    public List<IssueResponse> getAllIssuesUnfiltered() {
+        return issueRepository.findAll().stream().map(this::mapToResponse).toList();
+    }
+
     // adminEmail comes from JWT via controller — never trust request body for identity
     public IssueResponse assignIssue(AssignRequest request, String adminEmail) {
         if (request.getIssueId() == null)
@@ -161,7 +165,7 @@ public class IssueService {
         IssuesEntity issue = issueRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Issue not found with id: " + id));
 
-        return mapToResponse(issue);
+        return mapToDetailResponse(issue);
     }
 
     public List<IssueResponse> filterIssues(String status, String priority, Long staffId, String email, String role) {
