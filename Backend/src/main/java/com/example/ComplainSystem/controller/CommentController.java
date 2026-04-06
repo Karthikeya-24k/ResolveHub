@@ -3,6 +3,7 @@ package com.example.ComplainSystem.controller;
 import com.example.ComplainSystem.dto.request.CommentRequest;
 import com.example.ComplainSystem.dto.response.CommentResponse;
 import com.example.ComplainSystem.services.CommentService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentResponse addComment(@RequestBody CommentRequest request, Authentication auth) {
+    public CommentResponse addComment(@Valid @RequestBody CommentRequest request, Authentication auth) {
         return commentService.addComment(request, auth.getName());
     }
 

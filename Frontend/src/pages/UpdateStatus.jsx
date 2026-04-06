@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getAllIssuesUnfiltered, updateStatus } from '../services/api';
+import { getRole } from '../services/auth';
 import Layout from '../components/Layout';
 import Badge from '../components/Badge';
+import AlertMessage from '../components/AlertMessage';
 
-const STATUSES = ['OPEN', 'UNDER_REVIEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+const ALL_STATUSES = ['OPEN', 'UNDER_REVIEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
 
 const fieldCls = 'w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-on-surface outline-none transition-all focus:border-slate-900 focus:ring-0 appearance-none';
 
@@ -15,6 +17,8 @@ const UpdateStatus = () => {
   const [error, setError]         = useState('');
   const [loadError, setLoadError] = useState('');
   const [loading, setLoading]     = useState(false);
+  const role    = getRole();
+  const STATUSES = role === 'ADMIN' ? ALL_STATUSES : ALL_STATUSES.filter((s) => s !== 'CLOSED');
 
   useEffect(() => {
     getAllIssuesUnfiltered()
@@ -49,7 +53,7 @@ const UpdateStatus = () => {
   return (
     <Layout>
       <div className="mb-8">
-        <p className="text-primary font-bold text-xs tracking-widest uppercase mb-1">Staff Panel</p>
+        <p className="text-primary font-bold text-xs tracking-widest uppercase mb-1">{role === 'ADMIN' ? 'Admin Panel' : 'Staff Panel'}</p>
         <h2 className="text-3xl font-extrabold tracking-tight text-on-surface font-headline">Update Issue Status</h2>
         <p className="text-on-surface-variant mt-2">Move issues through the resolution workflow.</p>
       </div>
@@ -58,21 +62,9 @@ const UpdateStatus = () => {
         {/* Form */}
         <div className="lg:col-span-1 space-y-4">
           <div className="bg-surface-container-lowest rounded-xl p-6 ambient-shadow border border-outline-variant/10">
-            {loadError && (
-              <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-amber-50 text-amber-800 text-sm">
-                <span className="material-symbols-outlined text-base">warning</span>{loadError}
-              </div>
-            )}
-            {error && (
-              <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-red-50 text-red-700 text-sm">
-                <span className="material-symbols-outlined text-base">error</span>{error}
-              </div>
-            )}
-            {success && (
-              <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-green-50 text-green-700 text-sm">
-                <span className="material-symbols-outlined text-base">check_circle</span>{success}
-              </div>
-            )}
+            <AlertMessage type="warning" message={loadError} />
+            <AlertMessage type="error"   message={error} />
+            <AlertMessage type="success" message={success} />
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Step 1 */}

@@ -7,6 +7,7 @@ import com.example.ComplainSystem.dto.request.StatusUpdateRequest;
 import com.example.ComplainSystem.dto.response.ApiResponse;
 import com.example.ComplainSystem.entity.IssuesEntity;
 import com.example.ComplainSystem.repository.IssueRepo;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
@@ -29,7 +30,7 @@ public class IssueController {
     }
 
     @PostMapping
-    public ApiResponse<IssueResponse> createIssue(@RequestBody IssueRequest request,
+    public ApiResponse<IssueResponse> createIssue(@Valid @RequestBody IssueRequest request,
                                                    Authentication auth) {
         return new ApiResponse<>("success", issueService.createIssue(request, auth.getName()));
     }
@@ -42,12 +43,12 @@ public class IssueController {
     }
 
     @PostMapping("/assign")
-    public IssueResponse assignIssue(@RequestBody AssignRequest request, Authentication auth) {
+    public IssueResponse assignIssue(@Valid @RequestBody AssignRequest request, Authentication auth) {
         return issueService.assignIssue(request, auth.getName());
     }
 
     @PutMapping("/status")
-    public IssueResponse updateStatus(@RequestBody StatusUpdateRequest request) {
+    public IssueResponse updateStatus(@Valid @RequestBody StatusUpdateRequest request) {
         return issueService.updateStatus(request);
     }
 

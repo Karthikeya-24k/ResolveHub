@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllIssues } from '../services/api';
 import { getRole } from '../services/auth';
 import Layout from '../components/Layout';
+import AlertMessage from '../components/AlertMessage';
 
 const STATUS_COLOR = {
   OPEN:         'bg-blue-100 text-blue-700',
@@ -76,12 +77,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-3 p-4 mb-6 rounded-lg bg-error-container text-on-error-container text-sm">
-          <span className="material-symbols-outlined">error</span>
-          {error}
-        </div>
-      )}
+      <AlertMessage type="error" message={error} />
 
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

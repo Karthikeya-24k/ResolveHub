@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/api';
 import { saveToken } from '../services/auth';
+import AlertMessage from '../components/AlertMessage';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -40,12 +41,7 @@ const Login = () => {
 
         {/* Card */}
         <div className="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/10">
-          {error && (
-            <div className="flex items-start gap-3 p-4 mb-6 rounded-lg bg-error-container text-on-error-container text-sm">
-              <span className="material-symbols-outlined text-[1.25rem]">error</span>
-              <p>{error}</p>
-            </div>
-          )}
+          <AlertMessage type="error" message={error} />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

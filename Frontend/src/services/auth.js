@@ -26,4 +26,14 @@ export const getEmail = () => {
   return decoded?.sub || null;
 };
 
-export const isAuthenticated = () => !!getToken();
+export const isAuthenticated = () => {
+  const token = getToken();
+  if (!token) return false;
+  const decoded = decodeToken(token);
+  if (!decoded?.exp) return false;
+  if (decoded.exp * 1000 < Date.now()) {
+    removeToken();
+    return false;
+  }
+  return true;
+};

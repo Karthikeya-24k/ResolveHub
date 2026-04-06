@@ -7,6 +7,7 @@ import com.example.ComplainSystem.dto.response.ApiResponse;
 import com.example.ComplainSystem.dto.response.UserResponse;
 import com.example.ComplainSystem.services.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,19 +29,19 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<UserResponse> register(@RequestBody UserRequest request) {
+    public ApiResponse<UserResponse> register(@Valid @RequestBody UserRequest request) {
         return new ApiResponse<>("success", userService.register(request));
     }
 
     @PostMapping("/login")
-    public ApiResponse<String> login(@RequestBody LoginRequest request) {
+    public ApiResponse<String> login(@Valid @RequestBody LoginRequest request) {
         return new ApiResponse<>("success", userService.login(request));
     }
 
     @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<UserResponse> updateRole(@PathVariable Long id,
-                                                @RequestBody RoleUpdateRequest request) {
+                                                @Valid @RequestBody RoleUpdateRequest request) {
         return new ApiResponse<>("success", userService.updateRole(id, request));
     }
 }

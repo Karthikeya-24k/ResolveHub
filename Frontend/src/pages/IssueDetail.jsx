@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getIssueById, addComment, getCommentsByIssue } from '../services/api';
 import Layout from '../components/Layout';
 import Badge from '../components/Badge';
+import AlertMessage from '../components/AlertMessage';
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -126,12 +127,7 @@ const IssueDetail = () => {
             {/* Comment Input */}
             <div className="mt-8 bg-white p-6 rounded-xl ambient-shadow border-2 border-indigo-100">
               <label className="block text-xs font-label uppercase tracking-widest text-slate-500 mb-3">Add a Comment</label>
-              {commentError && (
-                <div className="flex items-center gap-2 p-3 mb-3 rounded-lg bg-error-container text-on-error-container text-xs">
-                  <span className="material-symbols-outlined text-sm">error</span>
-                  {commentError}
-                </div>
-              )}
+              <AlertMessage type="error" message={commentError} />
               <form onSubmit={handleComment}>
                 <textarea
                   className="w-full bg-surface-container-lowest border-none rounded-lg focus:ring-2 focus:ring-primary outline-none p-4 text-sm resize-none transition-all duration-200"

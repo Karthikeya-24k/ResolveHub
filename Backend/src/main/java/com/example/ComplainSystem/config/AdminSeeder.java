@@ -2,6 +2,8 @@ package com.example.ComplainSystem.config;
 
 import com.example.ComplainSystem.entity.User;
 import com.example.ComplainSystem.repository.UserRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AdminSeeder implements ApplicationRunner {
+
+    private static final Logger log = LoggerFactory.getLogger(AdminSeeder.class);
 
     private final UserRepo userRepo;
     private final BCryptPasswordEncoder encoder;
@@ -28,7 +32,7 @@ public class AdminSeeder implements ApplicationRunner {
                     .role("ADMIN")
                     .build();
             userRepo.save(admin);
-            System.out.println(">>> Default ADMIN user created.");
+            log.info("Default ADMIN user created.");
         }
     }
 }

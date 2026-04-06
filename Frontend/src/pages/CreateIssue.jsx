@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createIssue } from '../services/api';
 import Layout from '../components/Layout';
+import AlertMessage from '../components/AlertMessage';
 
 const CreateIssue = () => {
   const navigate = useNavigate();
@@ -37,12 +38,7 @@ const CreateIssue = () => {
         {/* Form */}
         <div className="lg:col-span-8">
           <div className="bg-surface-container-lowest rounded-xl p-8 ambient-shadow">
-            {error && (
-              <div className="flex items-start gap-3 p-4 mb-6 rounded-lg bg-error-container text-on-error-container text-sm">
-                <span className="material-symbols-outlined text-[1.25rem]">error</span>
-                <p>{error}</p>
-              </div>
-            )}
+            <AlertMessage type="error" message={error} />
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-2">
                 <label className="text-[11px] uppercase tracking-widest text-slate-500 font-bold">Issue Title</label>

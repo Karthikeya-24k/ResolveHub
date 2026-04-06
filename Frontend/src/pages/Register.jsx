@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/api';
+import AlertMessage from '../components/AlertMessage';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -50,18 +51,8 @@ const Register = () => {
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/10">
-          {error && (
-            <div className="flex items-start gap-3 p-4 mb-6 rounded-lg bg-error-container text-on-error-container text-sm">
-              <span className="material-symbols-outlined text-[1.25rem]">error</span>
-              <p>{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="flex items-start gap-3 p-4 mb-6 rounded-lg bg-green-50 text-green-800 text-sm">
-              <span className="material-symbols-outlined text-[1.25rem]">check_circle</span>
-              <p>{success}</p>
-            </div>
-          )}
+          <AlertMessage type="error"   message={error} />
+          <AlertMessage type="success" message={success} />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {field('Full Name',  'person', 'text',     'name',     'John Doe')}

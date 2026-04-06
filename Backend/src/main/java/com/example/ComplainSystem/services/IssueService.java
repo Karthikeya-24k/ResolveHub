@@ -10,6 +10,7 @@ import com.example.ComplainSystem.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.example.ComplainSystem.dto.request.IssueRequest;
 import com.example.ComplainSystem.dto.response.IssueResponse;
@@ -58,11 +59,6 @@ public class IssueService {
     }
 
     public IssueResponse createIssue(IssueRequest request, String email) {
-        if (request.getTitle() == null || request.getTitle().isBlank())
-            throw new RuntimeException("Title must not be empty");
-        if (request.getDescription() == null || request.getDescription().isBlank())
-            throw new RuntimeException("Description must not be empty");
-
         User creator = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
@@ -92,15 +88,7 @@ public class IssueService {
         return issueRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
-    // adminEmail comes from JWT via controller — never trust request body for identity
     public IssueResponse assignIssue(AssignRequest request, String adminEmail) {
-        if (request.getIssueId() == null)
-            throw new RuntimeException("Issue ID must not be null");
-        if (request.getStaffId() == null)
-            throw new RuntimeException("Staff ID must not be null");
-        if (request.getPriority() == null || request.getPriority().isBlank())
-            throw new RuntimeException("Priority must not be empty");
-
         IssuesEntity issue = issueRepository.findById(request.getIssueId())
                 .orElseThrow(() -> new RuntimeException("Issue not found with id: " + request.getIssueId()));
 
@@ -118,21 +106,16 @@ public class IssueService {
 
         issue.setAssignedBy(admin);
         issue.setAssignedTo(staff);
-        issue.setPriority(request.getPriority().toUpperCase());
+        issue.setPriority(request.getPriority().toUpperCase(Locale.ROOT));
         issue.setStatus(Status.ASSIGNED);
 
         return mapToResponse(issueRepository.save(issue));
     }
 
     public IssueResponse updateStatus(StatusUpdateRequest request) {
-        if (request.getIssueId() == null)
-            throw new RuntimeException("Issue ID must not be null");
-        if (request.getStatus() == null || request.getStatus().isBlank())
-            throw new RuntimeException("Status must not be empty");
-
         Status newStatus;
         try {
-            newStatus = Status.valueOf(request.getStatus().toUpperCase());
+            newStatus = Status.valueOf(request.getStatus().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("Invalid status '" + request.getStatus() + "'. Allowed: OPEN, UNDER_REVIEW, ASSIGNED, IN_PROGRESS, RESOLVED, CLOSED");
         }
@@ -159,12 +142,8 @@ public class IssueService {
     }
 
     public IssueResponse getIssueById(Long id) {
-        if (id == null)
-            throw new RuntimeException("Issue ID must not be null");
-
         IssuesEntity issue = issueRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Issue not found with id: " + id));
-
         return mapToDetailResponse(issue);
     }
 
@@ -172,14 +151,14 @@ public class IssueService {
         if (status != null) {
             Status s;
             try {
-                s = Status.valueOf(status.toUpperCase());
+                s = Status.valueOf(status.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 throw new RuntimeException("Invalid status filter: " + status);
             }
             return issueRepository.findByStatus(s).stream().map(this::mapToResponse).toList();
         }
         if (priority != null)
-            return issueRepository.findByPriority(priority.toUpperCase()).stream().map(this::mapToResponse).toList();
+            return issueRepository.findByPriority(priority.toUpperCase(Locale.ROOT)).stream().map(this::mapToResponse).toList();
         if (staffId != null)
             return issueRepository.findByAssignedTo_Id(staffId).stream().map(this::mapToResponse).toList();
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getAllIssues, getAllUsers, assignIssue } from '../services/api';
 import Layout from '../components/Layout';
+import AlertMessage from '../components/AlertMessage';
 
 const AssignIssue = () => {
   const [issues, setIssues]   = useState([]);
@@ -59,9 +60,9 @@ const AssignIssue = () => {
         {/* Form */}
         <div className="lg:col-span-2 space-y-6">
           <section className="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/10">
-            {loadError && <div className="flex items-center gap-2 p-4 mb-6 rounded-lg bg-amber-50 text-amber-800 text-sm"><span className="material-symbols-outlined">warning</span>{loadError}</div>}
-            {error     && <div className="flex items-center gap-2 p-4 mb-6 rounded-lg bg-error-container text-on-error-container text-sm"><span className="material-symbols-outlined">error</span>{error}</div>}
-            {success   && <div className="flex items-center gap-2 p-4 mb-6 rounded-lg bg-green-50 text-green-800 text-sm"><span className="material-symbols-outlined">check_circle</span>{success}</div>}
+            <AlertMessage type="warning" message={loadError} />
+            <AlertMessage type="error"   message={error} />
+            <AlertMessage type="success" message={success} />
 
             <form onSubmit={handleSubmit} className="space-y-10">
               {/* Step 1 */}

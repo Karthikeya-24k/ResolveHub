@@ -2,16 +2,20 @@ import { useEffect, useState } from 'react';
 import { getAllUsers, updateUserRole } from '../services/api';
 import Layout from '../components/Layout';
 import Badge from '../components/Badge';
+import AlertMessage from '../components/AlertMessage';
 
 const ROLES = ['USER', 'STAFF', 'ADMIN'];
 
 const ManageUsers = () => {
-  const [users, setUsers]       = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState('');
-  const [updating, setUpdating] = useState(null);
-  const [selected, setSelected] = useState({});
+  const [users, setUsers]         = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState('');
+  const [updating, setUpdating]   = useState(null);
+  const [selected, setSelected]   = useState({});
   const [updateMsg, setUpdateMsg] = useState({});
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterRole, setFilterRole] = useState('');
+  const [search, setSearch]         = useState('');
 
   useEffect(() => {
     getAllUsers()
@@ -40,6 +44,17 @@ const ManageUsers = () => {
     }
   };
 
+  const filtered = users.filter((u) => {
+    const matchRole   = filterRole ? u.role === filterRole : true;
+    const matchSearch = search
+      ? u.name.toLowerCase().includes(search.toLowerCase()) ||
+        u.email.toLowerCase().includes(search.toLowerCase())
+      : true;
+    return matchRole && matchSearch;
+  });
+
+  const isFiltered = filterRole || search;
+
   const admins = users.filter((u) => u.role === 'ADMIN').length;
   const staff  = users.filter((u) => u.role === 'STAFF').length;
   const normal = users.filter((u) => u.role === 'USER').length;
@@ -55,9 +70,9 @@ const ManageUsers = () => {
         </div>
         <div className="lg:col-span-8 grid grid-cols-3 gap-4">
           {[
-            { label: 'Total Admins',    value: admins, accent: 'text-primary',    border: '' },
-            { label: 'Staff Members',   value: staff,  accent: 'text-on-surface', border: 'border-l-4 border-primary' },
-            { label: 'Standard Users',  value: normal, accent: 'text-on-surface', border: '' },
+            { label: 'Total Admins',   value: admins, accent: 'text-primary',    border: '' },
+            { label: 'Staff Members',  value: staff,  accent: 'text-on-surface', border: 'border-l-4 border-primary' },
+            { label: 'Standard Users', value: normal, accent: 'text-on-surface', border: '' },
           ].map(({ label, value, accent, border }) => (
             <div key={label} className={`bg-surface-container-lowest p-6 rounded-xl ambient-shadow flex flex-col gap-2 ${border}`}>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</span>
@@ -72,31 +87,74 @@ const ManageUsers = () => {
         <div className="px-6 py-5 flex justify-between items-center border-b border-surface-container-high">
           <h3 className="font-headline font-bold text-on-surface">Access List</h3>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-surface-container-high rounded-lg transition-all">
+            <button
+              onClick={() => setShowFilter((v) => !v)}
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                isFiltered
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-slate-600 hover:bg-surface-container-high'
+              }`}
+            >
               <span className="material-symbols-outlined text-sm">filter_list</span>
-              Filter
-            </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-primary-fixed hover:bg-secondary-container rounded-lg transition-all">
-              <span className="material-symbols-outlined text-sm">download</span>
-              Export CSV
+              Filter{isFiltered ? ` (${[filterRole, search].filter(Boolean).length})` : ''}
             </button>
           </div>
         </div>
 
-        {error ? (
-          <div className="flex items-center gap-3 p-6 text-sm text-on-error-container bg-error-container">
-            <span className="material-symbols-outlined">error</span>
-            {error}
+        {/* Filter Panel */}
+        {showFilter && (
+          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Search</label>
+                <input
+                  type="text"
+                  placeholder="Name or email..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-900 transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Role</label>
+                <select
+                  value={filterRole}
+                  onChange={(e) => setFilterRole(e.target.value)}
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-slate-900 transition-all appearance-none"
+                >
+                  <option value="">All Roles</option>
+                  {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+            </div>
+            <button
+              onClick={() => { setFilterRole(''); setSearch(''); setShowFilter(false); }}
+              className="mt-3 text-xs text-primary font-semibold hover:underline"
+            >
+              Clear filters
+            </button>
           </div>
-        ) : loading ? (
+        )}
+
+        <AlertMessage type="error" message={error} />
+
+        {loading ? (
           <div className="flex items-center justify-center p-12 gap-3 text-on-surface-variant">
             <span className="material-symbols-outlined animate-spin">progress_activity</span>
             Loading users...
           </div>
-        ) : users.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-on-surface-variant">
             <span className="material-symbols-outlined text-5xl mb-3 opacity-30">group</span>
-            <p className="text-sm font-medium">No users found.</p>
+            <p className="text-sm font-medium">{isFiltered ? 'No users match the filters.' : 'No users found.'}</p>
+            {isFiltered && (
+              <button
+                onClick={() => { setFilterRole(''); setSearch(''); }}
+                className="mt-3 text-xs text-primary font-semibold hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -109,7 +167,7 @@ const ManageUsers = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-container-low">
-                {users.map((user) => (
+                {filtered.map((user) => (
                   <tr key={user.id} className="hover:bg-surface-container-low transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
@@ -149,7 +207,7 @@ const ManageUsers = () => {
                           {updating === user.id ? 'Saving...' : 'Update'}
                         </button>
                         {updateMsg[user.id] && (
-                          <span className={`text-[10px] font-bold ${updateMsg[user.id].type === 'success' ? 'text-green-600' : 'text-error'}`}>
+                          <span className={`text-[10px] font-bold ${updateMsg[user.id].type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
                             {updateMsg[user.id].text}
                           </span>
                         )}
