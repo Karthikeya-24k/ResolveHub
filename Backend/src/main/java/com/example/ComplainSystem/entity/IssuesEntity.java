@@ -67,4 +67,9 @@ public class IssuesEntity {
     /** Set when user reopens once. Prevents reopening a second time. */
     private java.time.LocalDateTime reopenedAt;
 
+    /** Timestamp when this complaint was first created */
+    @Column(nullable = false, updatable = false)
+    @Builder.Default
+    private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
+
 }

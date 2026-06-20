@@ -53,7 +53,8 @@ public class IssueService {
                 displayCreator,
                 issue.getOrganizationId(),
                 issue.isAnonymous(),
-                issue.getResolvedAt()
+                issue.getResolvedAt(),
+                issue.getCreatedAt()
         );
     }
 
@@ -75,7 +76,8 @@ public class IssueService {
                 displayCreator,
                 issue.getOrganizationId(),
                 issue.isAnonymous(),
-                issue.getResolvedAt()
+                issue.getResolvedAt(),
+                issue.getCreatedAt()
         );
     }
 

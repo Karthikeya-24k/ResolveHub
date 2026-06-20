@@ -198,6 +198,15 @@ const IssueList = () => {
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge value={issue.status || 'OPEN'} />
                     <Badge value={issue.priority || 'LOW'} />
+                    {issue.createdAt && (
+                      <span className="text-[10px] flex items-center gap-1" style={{ color: 'var(--text-faint)' }}>
+                        <span className="material-symbols-outlined text-[12px]">schedule</span>
+                        {new Date(issue.createdAt).toLocaleString('en-IN', {
+                          day: '2-digit', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit'
+                        })}
+                      </span>
+                    )}
                     <Link
                       to={`/issues/${issue.id}`}
                       className="ml-auto inline-flex items-center gap-1 text-primary text-xs font-bold hover:underline"
@@ -214,7 +223,7 @@ const IssueList = () => {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-surface-container text-on-surface-variant">
-                    {['ID', 'Title', 'Status', 'Priority', 'Actions'].map((h) => (
+                    {['ID', 'Title', 'Status', 'Priority', 'Raised On', 'Actions'].map((h) => (
                       <th key={h} className="px-6 py-4 text-[11px] font-black uppercase tracking-widest">{h}</th>
                     ))}
                   </tr>
@@ -229,6 +238,12 @@ const IssueList = () => {
                       </td>
                       <td className="px-6 py-4"><Badge value={issue.status || 'OPEN'} /></td>
                       <td className="px-6 py-4"><Badge value={issue.priority || 'LOW'} /></td>
+                      <td className="px-6 py-4 text-xs" style={{ color: 'var(--text-muted)' }}>
+                        {issue.createdAt ? new Date(issue.createdAt).toLocaleString('en-IN', {
+                          day: '2-digit', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit'
+                        }) : '—'}
+                      </td>
                       <td className="px-6 py-4">
                         <Link
                           to={`/issues/${issue.id}`}

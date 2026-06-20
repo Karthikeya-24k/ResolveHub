@@ -23,4 +23,5 @@ public class IssueResponse {
     private Long organizationId;
     private boolean anonymous;
     private LocalDateTime resolvedAt;
+    private LocalDateTime createdAt;
 }

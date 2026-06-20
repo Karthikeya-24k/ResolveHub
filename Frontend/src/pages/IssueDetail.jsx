@@ -196,6 +196,17 @@ const IssueDetail = () => {
                 <span style={{ color: 'var(--text-muted)' }}>Issue ID</span>
                 <span className="font-bold text-on-surface">#{issue.id}</span>
               </div>
+              {issue.createdAt && (
+                <div className="flex justify-between items-start text-sm gap-4">
+                  <span style={{ color: 'var(--text-muted)' }}>Raised On</span>
+                  <span className="font-bold text-on-surface text-right text-xs">
+                    {new Date(issue.createdAt).toLocaleString('en-IN', {
+                      day: '2-digit', month: 'short', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
