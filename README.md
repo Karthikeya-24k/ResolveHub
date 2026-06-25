@@ -492,7 +492,10 @@ These accounts are seeded automatically on first startup:
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project was built for educational purposes as part of an academic submission.  
+© 2026 K. M. Karthikeya. All rights reserved.
+
+No part of this codebase may be copied, reproduced, distributed, or used in any form without explicit written permission from the author.
 
 ---
 
