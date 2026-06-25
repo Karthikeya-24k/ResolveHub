@@ -171,6 +171,150 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ── How to Access ─────────────────────────────── */}
+      <section className="px-6 py-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest text-indigo-600 mb-2">Get Started</p>
+            <h2 className="font-headline font-extrabold text-3xl md:text-4xl tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              How to Access ResolveHub
+            </h2>
+            <p className="text-sm mt-3 max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
+              Whether you're an organization, a team member, or a member of the public — here's exactly where you start.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            {/* Card 1 — Already a member */}
+            <div
+              className="group relative rounded-2xl p-7 flex flex-col gap-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer"
+              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--surface-border)' }}
+              onClick={() => navigate('/login')}
+            >
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ boxShadow: '0 0 0 2px #4f46e5' }} />
+              <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
+                <span className="material-symbols-outlined text-indigo-600 text-2xl">login</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-headline font-bold text-base" style={{ color: 'var(--text-primary)' }}>Already a Member?</h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600">Staff / User</span>
+                </div>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+                  If your organization is already on ResolveHub, your admin has created an account for you. Check your email for credentials and sign in directly.
+                </p>
+                <ul className="space-y-2">
+                  {['Your admin shares your login credentials', 'Change your password on first login', 'Access your role-based dashboard instantly'].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="material-symbols-outlined text-sm text-indigo-500 shrink-0 mt-0.5">check_circle</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate('/login'); }}
+                className="w-full py-2.5 rounded-xl primary-gradient text-white text-sm font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">login</span>
+                Sign In Now
+              </button>
+            </div>
+
+            {/* Card 2 — New Organization */}
+            <div
+              className="group relative rounded-2xl p-7 flex flex-col gap-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer"
+              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--surface-border)' }}
+              onClick={() => navigate('/register')}
+            >
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ boxShadow: '0 0 0 2px #4f46e5' }} />
+              {/* Featured badge */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full primary-gradient text-white shadow-md shadow-indigo-500/30">
+                  Most Common
+                </span>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
+                <span className="material-symbols-outlined text-purple-600 text-2xl">domain_add</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-headline font-bold text-base" style={{ color: 'var(--text-primary)' }}>New Organization?</h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600">Admin</span>
+                </div>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+                  Apply for access on behalf of your organization. Once approved by our Super Admin, your workspace, admin account, and public complaint portal are auto-provisioned.
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    'Fill the onboarding form — takes 2 minutes',
+                    'Super Admin reviews & approves your request',
+                    'Receive admin credentials + public portal URL',
+                    'Add your staff & users, start managing complaints',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="material-symbols-outlined text-sm text-purple-500 shrink-0 mt-0.5">check_circle</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate('/register'); }}
+                className="w-full py-2.5 rounded-xl primary-gradient text-white text-sm font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">domain_add</span>
+                Apply for Access
+              </button>
+            </div>
+
+            {/* Card 3 — Public / Anonymous */}
+            <div
+              className="group relative rounded-2xl p-7 flex flex-col gap-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
+              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--surface-border)' }}
+            >
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ boxShadow: '0 0 0 2px #4f46e5' }} />
+              <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110">
+                <span className="material-symbols-outlined text-green-600 text-2xl">public</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-headline font-bold text-base" style={{ color: 'var(--text-primary)' }}>Public Complaint?</h3>
+                  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600">No Login</span>
+                </div>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-muted)' }}>
+                  No account needed. If your organization has a public portal, visit their unique link to submit a complaint — anonymously or with your name.
+                </p>
+                <ul className="space-y-2">
+                  {[
+                    'Visit your org\'s portal at /org/your-org-name',
+                    'Submit with or without your name',
+                    'Optionally add email to receive a tracking link',
+                    'Track progress anytime via the magic link',
+                    'Reopen if unsatisfied within 48 hours',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="material-symbols-outlined text-sm text-green-500 shrink-0 mt-0.5">check_circle</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="w-full py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                style={{ backgroundColor: 'var(--surface-raised)', color: 'var(--text-muted)', border: '1px solid var(--surface-border)' }}>
+                <span className="material-symbols-outlined text-sm">link</span>
+                Get the link from your organization
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── Onboarding flow ────────────────────────────────────── */}
       <section className="px-6 py-20" style={{ backgroundColor: 'var(--surface-raised)' }}>
         <div className="max-w-5xl mx-auto">
