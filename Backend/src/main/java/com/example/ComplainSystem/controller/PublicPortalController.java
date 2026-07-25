@@ -11,10 +11,13 @@ import com.example.ComplainSystem.repository.IssueRepo;
 import com.example.ComplainSystem.repository.OrganizationRepository;
 import com.example.ComplainSystem.repository.UserRepo;
 import com.example.ComplainSystem.services.EmailService;
+import com.example.ComplainSystem.services.FileUploadService;
 import com.example.ComplainSystem.services.NotificationService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,19 +34,22 @@ public class PublicPortalController {
     private final CommentRepository commentRepository;
     private final EmailService emailService;
     private final NotificationService notificationService;
+    private final FileUploadService fileUploadService;
 
     public PublicPortalController(OrganizationRepository orgRepository,
                                    IssueRepo issueRepository,
                                    UserRepo userRepository,
                                    CommentRepository commentRepository,
                                    EmailService emailService,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   FileUploadService fileUploadService) {
         this.orgRepository       = orgRepository;
         this.issueRepository     = issueRepository;
         this.userRepository      = userRepository;
         this.commentRepository   = commentRepository;
         this.emailService        = emailService;
         this.notificationService = notificationService;
+        this.fileUploadService   = fileUploadService;
     }
 
     /** Returns basic org info for the public portal page */
@@ -61,11 +67,11 @@ public class PublicPortalController {
     }
 
     /** Public complaint submission — no login required */
-    @PostMapping("/org/{slug}/complaints")
+    @PostMapping(value = "/org/{slug}/complaints", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE })
     public ApiResponse<Map<String, String>> submitPublicComplaint(
             @PathVariable String slug,
-            @Valid @RequestBody PublicComplaintRequest request) {
-
+            @RequestPart("data") @Valid PublicComplaintRequest request,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         Organization org = orgRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Organization not found"));
         if (!"ACTIVE".equals(org.getStatus()))
@@ -107,6 +113,10 @@ public class PublicPortalController {
 
         IssuesEntity saved = issueRepository.save(issue);
 
+        // Upload attachments
+    fileUploadService.uploadAndSave(files, saved.getId(), null);
+    System.out.println("Files uploaded");
+
         boolean emailSent = false;
         if (request.getSubmitterEmail() != null && !request.getSubmitterEmail().isBlank()) {
             String recipientName = request.isAnonymous() ? "there"
@@ -120,6 +130,7 @@ public class PublicPortalController {
                     org.getName(),
                     trackingToken
             );
+            System.out.println("Email sent");
             emailSent = true;
         }
 
@@ -255,6 +266,8 @@ public class PublicPortalController {
         issue.setResolvedAt(null);
         issue.setReopenedAt(java.time.LocalDateTime.now());
         IssuesEntity saved = issueRepository.save(issue);
+        System.out.println("Issue saved");
+
 
         // Save reopen comment with the user's reason
         String reason = (body != null && body.get("reason") != null && !body.get("reason").isBlank())

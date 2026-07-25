@@ -5,6 +5,8 @@ import { getRole } from '../services/auth';
 import Layout from '../components/Layout';
 import Badge from '../components/Badge';
 import AlertMessage from '../components/AlertMessage';
+import AttachmentList from '../components/AttachmentList';
+import FileUpload from '../components/FileUpload';
 
 const IssueDetail = () => {
   const { id } = useParams();
@@ -13,6 +15,7 @@ const IssueDetail = () => {
   const [issue, setIssue]         = useState(null);
   const [comments, setComments]   = useState([]);
   const [message, setMessage]     = useState('');
+  const [commentFiles, setCommentFiles] = useState([]);
   const [loading, setLoading]     = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]         = useState('');
@@ -38,8 +41,9 @@ const IssueDetail = () => {
     setCommentError('');
     setSubmitting(true);
     try {
-      await addComment({ issueId: Number(id), message });
+      await addComment({ issueId: Number(id), message }, commentFiles);
       setMessage('');
+      setCommentFiles([]);
       fetchComments();
     } catch (err) {
       setCommentError(err.response?.data?.message || 'Failed to post comment.');
@@ -94,6 +98,7 @@ const IssueDetail = () => {
           <section className="bg-surface-container-lowest p-8 rounded-xl ambient-shadow">
             <h3 className="text-xs font-label uppercase tracking-widest mb-4" style={{ color: 'var(--text-muted)' }}>Description</h3>
             <p className="text-on-surface-variant font-body leading-relaxed">{issue.description}</p>
+            <AttachmentList attachments={issue.attachments} />
           </section>
 
           {/* Comments */}
@@ -120,6 +125,7 @@ const IssueDetail = () => {
                         <span className="font-bold text-sm text-on-surface">{c.userName}</span>
                       </div>
                       <p className="text-sm text-on-surface-variant leading-relaxed">{c.message}</p>
+                      <AttachmentList attachments={c.attachments} />
                     </div>
                   </div>
                 ))
@@ -127,7 +133,7 @@ const IssueDetail = () => {
             </div>
 
             {/* Comment Input */}
-            <div className="mt-8 p-6 rounded-xl ambient-shadow border-2" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--surface-border)' }}>
+              <div className="mt-8 p-6 rounded-xl ambient-shadow border-2" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--surface-border)' }}>
               <label className="block text-xs font-label uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>Add a Comment</label>
               <AlertMessage type="error" message={commentError} />
               <form onSubmit={handleComment}>
@@ -139,6 +145,9 @@ const IssueDetail = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
+                <div className="mt-3">
+                  <FileUpload files={commentFiles} onChange={setCommentFiles} />
+                </div>
                 <div className="flex justify-end mt-4">
                   <button
                     type="submit" disabled={submitting || !message.trim()}

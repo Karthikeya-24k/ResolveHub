@@ -97,6 +97,7 @@ public class SecurityConfig {
                 .requestMatchers("/issues/all").hasAnyRole("STAFF", "ADMIN", "SUPER_ADMIN")
                 .requestMatchers("/issues", "/issues/**").hasAnyRole("USER", "ADMIN", "STAFF", "SUPER_ADMIN")
                 .requestMatchers("/comments", "/comments/**").hasAnyRole("USER", "ADMIN", "STAFF", "SUPER_ADMIN")
+                .requestMatchers("/attachments", "/attachments/**").hasAnyRole("USER", "ADMIN", "STAFF", "SUPER_ADMIN")
                 .requestMatchers("/notifications", "/notifications/**").hasAnyRole("USER", "ADMIN", "STAFF", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )

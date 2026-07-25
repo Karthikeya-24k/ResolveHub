@@ -362,8 +362,8 @@ public class EmailService {
             CreateSmtpEmail result = brevoApi.sendTransacEmail(email);
             log.info("Email sent via Brevo API to {} — {} (messageId: {})", toEmail, subject, result.getMessageId());
         } catch (Exception e) {
-            log.error("Failed to send email via Brevo API to {} — {}: {}", toEmail, subject, e.getMessage());
-        }
+    log.error("Failed to send email via Brevo API", e);
+}
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ package com.example.ComplainSystem.services;
 import com.example.ComplainSystem.dto.request.AssignRequest;
 import com.example.ComplainSystem.dto.request.IssueRequest;
 import com.example.ComplainSystem.dto.request.StatusUpdateRequest;
+import com.example.ComplainSystem.dto.response.AttachmentResponse;
 import com.example.ComplainSystem.dto.response.CommentResponse;
 import com.example.ComplainSystem.dto.response.IssueResponse;
 import com.example.ComplainSystem.entity.IssuesEntity;
@@ -13,6 +14,7 @@ import com.example.ComplainSystem.repository.IssueRepo;
 import com.example.ComplainSystem.repository.UserRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Locale;
@@ -25,60 +27,68 @@ public class IssueService {
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
     private final EmailService emailService;
+    private final FileUploadService fileUploadService;
 
     public IssueService(UserRepo userRepository, IssueRepo issueRepository,
                         CommentRepository commentRepository,
                         NotificationService notificationService,
-                        EmailService emailService) {
+                        EmailService emailService,
+                        FileUploadService fileUploadService) {
         this.userRepository      = userRepository;
         this.issueRepository     = issueRepository;
         this.commentRepository   = commentRepository;
         this.notificationService = notificationService;
         this.emailService        = emailService;
+        this.fileUploadService   = fileUploadService;
     }
 
     // ── Mapping ────────────────────────────────────────────────────────────────
 
     private IssueResponse mapToResponse(IssuesEntity issue) {
         String displayCreator = resolveCreatorName(issue);
-        return new IssueResponse(
-                issue.getId(),
-                issue.getTicketNumber(),
-                issue.getTitle(),
-                issue.getDescription(),
-                issue.getStatus().name(),
-                issue.getPriority(),
-                null,
-                issue.getAssignedTo() != null ? issue.getAssignedTo().getName() : null,
-                displayCreator,
-                issue.getOrganizationId(),
-                issue.isAnonymous(),
-                issue.getResolvedAt(),
-                issue.getCreatedAt()
-        );
+        IssueResponse r = new IssueResponse();
+        r.setId(issue.getId());
+        r.setTicketNumber(issue.getTicketNumber());
+        r.setTitle(issue.getTitle());
+        r.setDescription(issue.getDescription());
+        r.setStatus(issue.getStatus().name());
+        r.setPriority(issue.getPriority());
+        r.setAssignedTo(issue.getAssignedTo() != null ? issue.getAssignedTo().getName() : null);
+        r.setCreatedBy(displayCreator);
+        r.setOrganizationId(issue.getOrganizationId());
+        r.setAnonymous(issue.isAnonymous());
+        r.setResolvedAt(issue.getResolvedAt());
+        r.setCreatedAt(issue.getCreatedAt());
+        return r;
     }
 
     private IssueResponse mapToDetailResponse(IssuesEntity issue) {
         List<CommentResponse> comments = commentRepository.findByIssue_Id(issue.getId())
                 .stream()
-                .map(c -> new CommentResponse(c.getId(), c.getMessage(), c.getUser().getName()))
+                .map(c -> {
+                    CommentResponse cr = new CommentResponse(c.getId(), c.getMessage(), c.getUser().getName());
+                    cr.setAttachments(fileUploadService.getByComment(c.getId()));
+                    return cr;
+                })
                 .toList();
         String displayCreator = resolveCreatorName(issue);
-        return new IssueResponse(
-                issue.getId(),
-                issue.getTicketNumber(),
-                issue.getTitle(),
-                issue.getDescription(),
-                issue.getStatus().name(),
-                issue.getPriority(),
-                comments,
-                issue.getAssignedTo() != null ? issue.getAssignedTo().getName() : null,
-                displayCreator,
-                issue.getOrganizationId(),
-                issue.isAnonymous(),
-                issue.getResolvedAt(),
-                issue.getCreatedAt()
-        );
+        List<AttachmentResponse> attachments = fileUploadService.getByIssue(issue.getId());
+        IssueResponse r = new IssueResponse();
+        r.setId(issue.getId());
+        r.setTicketNumber(issue.getTicketNumber());
+        r.setTitle(issue.getTitle());
+        r.setDescription(issue.getDescription());
+        r.setStatus(issue.getStatus().name());
+        r.setPriority(issue.getPriority());
+        r.setComments(comments);
+        r.setAssignedTo(issue.getAssignedTo() != null ? issue.getAssignedTo().getName() : null);
+        r.setCreatedBy(displayCreator);
+        r.setOrganizationId(issue.getOrganizationId());
+        r.setAnonymous(issue.isAnonymous());
+        r.setResolvedAt(issue.getResolvedAt());
+        r.setCreatedAt(issue.getCreatedAt());
+        r.setAttachments(attachments);
+        return r;
     }
 
     /** Returns "Anonymous User" if anonymous, otherwise real name */
@@ -95,7 +105,7 @@ public class IssueService {
 
     // ── Create ─────────────────────────────────────────────────────────────────
 
-    public IssueResponse createIssue(IssueRequest request, String email) {
+    public IssueResponse createIssue(IssueRequest request, List<MultipartFile> files, String email) {
         User creator = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
@@ -113,10 +123,10 @@ public class IssueService {
 
         IssuesEntity saved = issueRepository.save(issue);
 
-        // Notify the admin about the new complaint
+        fileUploadService.uploadAndSave(files, saved.getId(), null);
+
         notificationService.notifyAdminOnNewIssue(saved);
 
-        // Send confirmation email — skip for anonymous submissions
         if (!saved.isAnonymous() && creator.getEmail() != null) {
             emailService.sendComplaintCreated(
                     creator.getEmail(),

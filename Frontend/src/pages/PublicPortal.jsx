@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getPublicOrgInfo, submitPublicComplaint } from '../services/api';
 import useDarkMode from '../hooks/useDarkMode';
+import FileUpload from '../components/FileUpload';
 
 const PublicPortal = () => {
   const { slug } = useParams();
@@ -9,6 +10,7 @@ const PublicPortal = () => {
   const [org, setOrg]           = useState(null);
   const [loadError, setLoadError] = useState('');
   const [form, setForm]         = useState({ title: '', description: '', submitterName: '', submitterEmail: '', anonymous: false });
+  const [files, setFiles]       = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(null); // ticket number on success
   const [emailSent, setEmailSent]   = useState(false);
@@ -25,7 +27,7 @@ const PublicPortal = () => {
     setError('');
     setSubmitting(true);
     try {
-      const res = await submitPublicComplaint(slug, form);
+      const res = await submitPublicComplaint(slug, form, files);
       setSubmitted(res.data.data.ticketNumber);
       setEmailSent(res.data.data.emailSent === 'true');
     } catch (err) {
@@ -93,7 +95,7 @@ const PublicPortal = () => {
                 <p className="text-xs mt-4" style={{ color: 'var(--text-faint)' }}>Save this ticket number to track your complaint.</p>
               )}
               <button
-                onClick={() => { setSubmitted(null); setForm({ title: '', description: '', submitterName: '', submitterEmail: '', anonymous: false }); }}
+                onClick={() => { setSubmitted(null); setForm({ title: '', description: '', submitterName: '', submitterEmail: '', anonymous: false }); setFiles([]); }}
                 className="mt-6 px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors"
                 style={{ backgroundColor: 'var(--surface-raised)', color: 'var(--text-primary)', border: '1px solid var(--surface-border)' }}
               >
@@ -192,6 +194,11 @@ const PublicPortal = () => {
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Your identity will be hidden from the admin. Stored securely for audit only.</p>
                     </div>
                   </label>
+
+                  <div className="space-y-1.5">
+                    <label className="label-muted">Attachments <span className="font-normal normal-case tracking-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span></label>
+                    <FileUpload files={files} onChange={setFiles} />
+                  </div>
 
                   <button
                     type="submit"

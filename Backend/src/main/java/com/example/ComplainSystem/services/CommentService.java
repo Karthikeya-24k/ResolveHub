@@ -2,6 +2,7 @@ package com.example.ComplainSystem.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.ComplainSystem.dto.request.CommentRequest;
 import com.example.ComplainSystem.dto.response.CommentResponse;
@@ -22,21 +23,24 @@ public class CommentService {
     private final UserRepo userRepository;
     private final NotificationService notificationService;
     private final EmailService emailService;
+    private final FileUploadService fileUploadService;
 
     public CommentService(CommentRepository commentRepository,
                           IssueRepo issueRepository,
                           UserRepo userRepository,
                           NotificationService notificationService,
-                          EmailService emailService) {
+                          EmailService emailService,
+                          FileUploadService fileUploadService) {
         this.commentRepository   = commentRepository;
         this.issueRepository     = issueRepository;
         this.userRepository      = userRepository;
         this.notificationService = notificationService;
         this.emailService        = emailService;
+        this.fileUploadService   = fileUploadService;
     }
 
     @Transactional
-    public CommentResponse addComment(CommentRequest request, String email) {
+    public CommentResponse addComment(CommentRequest request, List<MultipartFile> files, String email) {
         IssuesEntity issue = issueRepository.findById(request.getIssueId())
                 .orElseThrow(() -> new RuntimeException("Issue not found"));
 
@@ -50,6 +54,9 @@ public class CommentService {
                 .build();
 
         Comment saved = commentRepository.save(comment);
+
+        // Upload attachments linked to this comment
+        var attachments = fileUploadService.uploadAndSave(files, issue.getId(), saved.getId());
 
         // In-app notifications
         notificationService.notifyOnComment(issue, commenter);
@@ -84,11 +91,13 @@ public class CommentService {
             }
         }
 
-        return new CommentResponse(
+        CommentResponse response = new CommentResponse(
                 saved.getId(),
                 saved.getMessage(),
                 saved.getUser().getName()
         );
+        response.setAttachments(attachments);
+        return response;
     }
 
     @Transactional(readOnly = true)

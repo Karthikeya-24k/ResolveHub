@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { createIssue } from "../services/api";
 import Layout from "../components/Layout";
 import AlertMessage from "../components/AlertMessage";
+import FileUpload from "../components/FileUpload";
 
 const CreateIssue = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ title: "", description: "", anonymous: false });
+  const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +18,7 @@ const CreateIssue = () => {
     setLoading(true);
 
     try {
-      await createIssue(form);
+      await createIssue(form, files);
       navigate("/issues");
     } catch (err) {
       setError(
@@ -75,6 +77,11 @@ const CreateIssue = () => {
                     }
                     required
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="label-muted">Attachments <span className="font-normal normal-case tracking-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span></label>
+                  <FileUpload files={files} onChange={setFiles} />
                 </div>
 
                 {/* Anonymous toggle */}
